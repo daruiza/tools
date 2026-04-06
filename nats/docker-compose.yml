@@ -1,0 +1,44 @@
+
+networks:
+  app_network:
+    name: ${network}
+    external: true
+services: 
+  nats-server:
+    container_name: nats
+    image: nats:alpine3.21
+    # image: nats:nanoserver    
+    volumes:
+      - nats_jetstream:/data # Persistencia de JetStream (opcional)
+      - ./nats.conf:/etc/nats/nats.conf # Montar un archivo de configuración
+
+    ports:
+      # - '5223:4222'
+      - '4222:4222'
+      - '8222:8222' # Puerto para el monitor HTTP (opcional)
+    # command: ['-js'] # Habilita JetStream
+    command: ['-c', '/etc/nats/nats.conf'] # Usar el archivo de configuración
+    networks:
+      - app_network
+  
+  nats-cli:
+    image: natsio/nats-box:latest
+    container_name: nats-cli
+    depends_on:
+      - nats-server
+    command: tail -f /dev/null  # Mantener el contenedor corriendo
+    networks:
+      - app_network
+
+volumes:  
+  nats_jetstream:
+    external: true
+
+#Comandos
+# docker volume rm nats_jetstream
+# docker volume create nats_jetstream
+# docker exec -it nats-cli /bin/sh
+# nats -s nats://nats-server:4222 stream ls
+# nats -s nats://nats-server:4222 stream info PosConnect
+# nats -s nats://nats-server:4222 stream subjects
+# nats -s nats://nats-server:4222 consumer ls
