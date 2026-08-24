@@ -28,3 +28,8 @@ services:
       retries: 10 # Aumentamos reintentos para darle tiempo a arrancar
     networks:
       - app_network
+
+# Conexión a la base de datos MS SQL Server
+# Server: 127.0.0.1,1433
+# User: SA
+# Password: YourStrong!Passw0rd
